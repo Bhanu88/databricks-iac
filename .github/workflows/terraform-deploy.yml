@@ -52,29 +52,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Databricks enforces a hard limit of one Unity Catalog metastore per region
-      # per account.  If one already exists, Terraform must adopt it rather than
-      # create a new one.  We discover the existing ID here and export it as
-      # TF_VAR_databricks_metastore_id; the unity_catalog module uses count = 0
-      # on the metastore resource when this variable is non-empty.
-      - name: Discover existing Databricks metastore
-        run: |
-          DATABRICKS_TOKEN=$(az account get-access-token \
-            --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d \
-            --query accessToken -o tsv)
-          METASTORE_ID=$(curl -sf \
-            -H "Authorization: Bearer $DATABRICKS_TOKEN" \
-            "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/metastores" \
-            | jq -r --arg region "eastus2" \
-              '.metastores[] | select(.region == $region) | .metastore_id' \
-            | head -1)
-          if [ -n "$METASTORE_ID" ]; then
-            echo "Found existing metastore in eastus2: $METASTORE_ID"
-            echo "TF_VAR_databricks_metastore_id=$METASTORE_ID" >> $GITHUB_ENV
-          else
-            echo "No existing metastore found in eastus2 — Terraform will create one"
-          fi
-
       # The azurerm provider acquires its storage data-plane OAuth2 token once at
       # startup — granting this role inside Terraform is too late because the token
       # is issued before the role assignment is created.  Pre-grant here so every
@@ -133,24 +110,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
-
-      - name: Discover existing Databricks metastore
-        run: |
-          DATABRICKS_TOKEN=$(az account get-access-token \
-            --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d \
-            --query accessToken -o tsv)
-          METASTORE_ID=$(curl -sf \
-            -H "Authorization: Bearer $DATABRICKS_TOKEN" \
-            "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/metastores" \
-            | jq -r --arg region "eastus2" \
-              '.metastores[] | select(.region == $region) | .metastore_id' \
-            | head -1)
-          if [ -n "$METASTORE_ID" ]; then
-            echo "Found existing metastore in eastus2: $METASTORE_ID"
-            echo "TF_VAR_databricks_metastore_id=$METASTORE_ID" >> $GITHUB_ENV
-          else
-            echo "No existing metastore found in eastus2 — Terraform will create one"
-          fi
 
       - name: Pre-grant Storage Blob Data Contributor (ADLS Gen2 data-plane)
         run: |
