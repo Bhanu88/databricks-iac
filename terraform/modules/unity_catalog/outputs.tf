@@ -1,5 +1,7 @@
 output "metastore_id" {
-  value = databricks_metastore.this.id
+  # local.metastore_id resolves to the existing metastore ID when one was
+  # adopted, or to the newly-created metastore's ID otherwise.
+  value = local.metastore_id
 }
 
 output "energy_catalog_name" {
