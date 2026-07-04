@@ -52,6 +52,23 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # The azurerm provider acquires its storage data-plane OAuth2 token once at
+      # startup — granting this role inside Terraform is too late because the token
+      # is issued before the role assignment is created.  Pre-grant here so every
+      # token acquired during the apply already reflects the permission.
+      - name: Pre-grant Storage Blob Data Contributor (ADLS Gen2 data-plane)
+        run: |
+          SP_OBJECT_ID=$(az ad sp show --id "${{ secrets.AZURE_CLIENT_ID }}" --query id -o tsv)
+          echo "Ensuring Storage Blob Data Contributor on SP ${SP_OBJECT_ID}"
+          az role assignment create \
+            --assignee-object-id "$SP_OBJECT_ID" \
+            --assignee-principal-type ServicePrincipal \
+            --role "Storage Blob Data Contributor" \
+            --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+            || echo "Role assignment already exists — continuing"
+          echo "Waiting 30s for RBAC propagation before Terraform starts"
+          sleep 30
+
       - name: Terraform Init
         working-directory: ${{ env.TF_DIR }}
         run: terraform init -backend-config=environments/dev/backend.tf
@@ -93,6 +110,19 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
+
+      - name: Pre-grant Storage Blob Data Contributor (ADLS Gen2 data-plane)
+        run: |
+          SP_OBJECT_ID=$(az ad sp show --id "${{ secrets.AZURE_CLIENT_ID_PROD }}" --query id -o tsv)
+          echo "Ensuring Storage Blob Data Contributor on SP ${SP_OBJECT_ID}"
+          az role assignment create \
+            --assignee-object-id "$SP_OBJECT_ID" \
+            --assignee-principal-type ServicePrincipal \
+            --role "Storage Blob Data Contributor" \
+            --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}" \
+            || echo "Role assignment already exists — continuing"
+          echo "Waiting 30s for RBAC propagation before Terraform starts"
+          sleep 30
 
       - name: Terraform Init
         working-directory: ${{ env.TF_DIR }}
