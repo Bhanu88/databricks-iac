@@ -42,11 +42,33 @@ resource "azurerm_storage_account" "datalake" {
   tags = var.tags
 }
 
+# ----- Self-grant data-plane access for the Terraform runner ----------------
+# azurerm_storage_data_lake_gen2_filesystem calls the DFS data-plane API,
+# which requires a Storage Blob Data* role — ARM Owner/Contributor alone is
+# insufficient.  We grant the current SP (GitHub Actions OIDC identity) the
+# Contributor role here, then sleep 30 s for RBAC to propagate before
+# creating filesystems.
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_role_assignment" "terraform_sp_storage_blob" {
+  scope                = azurerm_storage_account.datalake.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+resource "time_sleep" "wait_for_rbac_propagation" {
+  depends_on      = [azurerm_role_assignment.terraform_sp_storage_blob]
+  create_duration = "30s"
+}
+
 # ----- Unity Catalog metastore container ------------------------------------
 # Separate top-level container used exclusively by Unity Catalog.
 resource "azurerm_storage_data_lake_gen2_filesystem" "unity_catalog" {
   name               = "unity-catalog"
   storage_account_id = azurerm_storage_account.datalake.id
+
+  depends_on = [time_sleep.wait_for_rbac_propagation]
 }
 
 # ----- Data lake zone containers --------------------------------------------
@@ -58,6 +80,8 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "zones" {
   for_each           = toset(local.lake_zones)
   name               = each.key
   storage_account_id = azurerm_storage_account.datalake.id
+
+  depends_on = [time_sleep.wait_for_rbac_propagation]
 }
 
 # ----- Managed Identity for Databricks → Storage ----------------------------
