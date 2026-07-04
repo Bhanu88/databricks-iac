@@ -1,0 +1,27 @@
+variable "prefix" {
+  description = "Naming prefix"
+  type        = string
+}
+
+variable "workspace_numeric_id" {
+  description = "Numeric Databricks workspace ID (used for mws_permission_assignment)"
+  type        = string
+}
+
+variable "admin_user_emails" {
+  description = "List of email addresses to seed into the platform-admins group"
+  type        = list(string)
+  default     = []
+}
+
+variable "analyst_warehouse_size" {
+  description = "SQL warehouse cluster size for analysts (2X-Small, X-Small, Small, Medium, Large)"
+  type        = string
+  default     = "Small"
+}
+
+variable "analyst_warehouse_max_clusters" {
+  description = "Maximum number of clusters for the analysts SQL warehouse"
+  type        = number
+  default     = 3
+}
