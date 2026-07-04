@@ -103,8 +103,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_audit" {
     category = "StorageDelete"
   }
 
-  # azurerm ~> 3.90 uses enabled_metric (not the legacy metric block)
-  enabled_metric {
+  metric {
     category = "Transaction"
+    enabled  = true
   }
 }

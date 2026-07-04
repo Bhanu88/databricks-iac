@@ -4,7 +4,7 @@ environment = "dev"
 location    = "eastus2"
 
 resource_group_name  = "energy-dev-rg"
-storage_account_name = "energytfstatedev"  # must be globally unique
+storage_account_name = "energydevlake01" # must be globally unique
 
 storage_replication_type = "LRS" # cheaper for dev
 
@@ -23,3 +23,5 @@ admin_user_emails = [
 ]
 
 # databricks_account_id is loaded from TF_VAR_databricks_account_id env var
+
+# ci trigger

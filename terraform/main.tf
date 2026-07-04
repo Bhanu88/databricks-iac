@@ -80,7 +80,7 @@ module "unity_catalog" {
 module "cluster_policies" {
   source = "./modules/cluster_policies"
 
-  prefix        = local.prefix
+  prefix         = local.prefix
   de_max_workers = var.de_max_workers
   ds_max_workers = var.ds_max_workers
 

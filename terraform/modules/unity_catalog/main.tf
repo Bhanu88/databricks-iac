@@ -13,14 +13,6 @@
 #   shared_<env>         – cross-team exchange catalog
 # ============================================================
 
-terraform {
-  required_providers {
-    databricks = {
-      source = "databricks/databricks"
-    }
-  }
-}
-
 # ----- Unity Catalog Metastore ----------------------------------------------
 resource "databricks_metastore" "this" {
   name          = "${var.prefix}-metastore"
