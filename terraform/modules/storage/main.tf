@@ -27,7 +27,7 @@ resource "azurerm_storage_account" "datalake" {
   public_network_access_enabled   = var.public_network_access_enabled
 
   blob_properties {
-    versioning_enabled  = true
+    # versioning_enabled is not supported when is_hns_enabled = true (ADLS Gen2)
     change_feed_enabled = true
 
     delete_retention_policy {

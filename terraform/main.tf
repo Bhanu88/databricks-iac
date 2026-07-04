@@ -77,16 +77,6 @@ module "unity_catalog" {
   ]
 }
 
-module "cluster_policies" {
-  source = "./modules/cluster_policies"
-
-  prefix         = local.prefix
-  de_max_workers = var.de_max_workers
-  ds_max_workers = var.ds_max_workers
-
-  depends_on = [module.workspace]
-}
-
 module "rbac" {
   source = "./modules/rbac"
 
@@ -97,6 +87,19 @@ module "rbac" {
   depends_on = [
     module.workspace,
     module.unity_catalog,
-    module.cluster_policies,
+  ]
+}
+
+module "cluster_policies" {
+  source = "./modules/cluster_policies"
+
+  prefix         = local.prefix
+  de_max_workers = var.de_max_workers
+  ds_max_workers = var.ds_max_workers
+
+  # rbac must run first — cluster policy permissions reference groups created by rbac
+  depends_on = [
+    module.workspace,
+    module.rbac,
   ]
 }
