@@ -77,3 +77,9 @@ variable "admin_user_emails" {
   type        = list(string)
   default     = []
 }
+
+variable "storage_public_network_access_enabled" {
+  description = "Allow public network access to the ADLS Gen2 storage account. Enable in dev so CI runners can reach the DFS endpoint; disable in prod and use private endpoints instead."
+  type        = bool
+  default     = false
+}

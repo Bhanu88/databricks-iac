@@ -50,12 +50,13 @@ module "workspace" {
 module "storage" {
   source = "./modules/storage"
 
-  prefix               = local.prefix
-  storage_account_name = var.storage_account_name
-  resource_group_name  = module.workspace.resource_group_name
-  location             = var.location
-  replication_type     = var.storage_replication_type
-  tags                 = local.common_tags
+  prefix                        = local.prefix
+  storage_account_name          = var.storage_account_name
+  resource_group_name           = module.workspace.resource_group_name
+  location                      = var.location
+  replication_type              = var.storage_replication_type
+  public_network_access_enabled = var.storage_public_network_access_enabled
+  tags                          = local.common_tags
 
   depends_on = [module.workspace]
 }

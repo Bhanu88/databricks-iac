@@ -8,6 +8,10 @@ storage_account_name = "energydevlake01" # must be globally unique
 
 storage_replication_type = "LRS" # cheaper for dev
 
+# Enable public DFS endpoint so GitHub Actions runners can create ADLS Gen2
+# filesystems during CI. Prod leaves this false and routes through private endpoints.
+storage_public_network_access_enabled = true
+
 # Networking
 vnet_cidr           = "10.0.0.0/16"
 public_subnet_cidr  = "10.0.1.0/24"
