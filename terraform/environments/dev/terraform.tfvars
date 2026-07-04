@@ -4,7 +4,7 @@ environment = "dev"
 location    = "eastus2"
 
 resource_group_name  = "energy-dev-rg"
-storage_account_name = "energydevdatalake"  # must be globally unique
+storage_account_name = "energytfstatedev"  # must be globally unique
 
 storage_replication_type = "LRS" # cheaper for dev
 
@@ -19,7 +19,7 @@ ds_max_workers = 4
 
 # Seed admin users (replace with real emails)
 admin_user_emails = [
-  "platform-admin@energyco.com",
+  "pat.bhanu@outlook.com",
 ]
 
 # databricks_account_id is loaded from TF_VAR_databricks_account_id env var
