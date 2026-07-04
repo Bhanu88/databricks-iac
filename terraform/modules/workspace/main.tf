@@ -103,13 +103,13 @@ resource "azurerm_databricks_workspace" "this" {
 resource "databricks_workspace_conf" "this" {
   custom_config = {
     # Enable IP access lists so databricks_ip_access_list resources take effect
-    "enableIpAccessLists"          = "true"
+    "enableIpAccessLists" = "true"
     # Disable result downloads to prevent data exfiltration via notebook output
-    "enableResultsDownloading"     = var.enable_results_downloading
+    "enableResultsDownloading" = var.enable_results_downloading
     # Disable clipboard export from notebook table cells
     "enableNotebookTableClipboard" = "false"
     # Enable PAT management; tokens expire after 90 days
-    "enableTokensConfig"           = "true"
-    "maxTokenLifetimeDays"         = "90"
+    "enableTokensConfig"   = "true"
+    "maxTokenLifetimeDays" = "90"
   }
 }
