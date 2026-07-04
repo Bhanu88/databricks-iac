@@ -75,6 +75,11 @@ jobs:
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # TF_VAR_azure_tenant_id feeds providers.tf → databricks.account provider's
+          # azure_tenant_id attribute.  The accounts host is cloud-agnostic so the
+          # provider cannot infer Azure from the URL; this var forces the Azure auth
+          # code-path and prevents "Failed to retrieve tenant ID for given token".
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Terraform Apply
         working-directory: ${{ env.TF_DIR }}
@@ -87,6 +92,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
   # ── Deploy Prod (requires manual approval via GitHub Environment) ─────────
   deploy-prod:
@@ -130,6 +136,7 @@ jobs:
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Terraform Plan
         working-directory: ${{ env.TF_DIR }}
@@ -142,6 +149,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Terraform Apply
         working-directory: ${{ env.TF_DIR }}
@@ -150,3 +158,4 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}

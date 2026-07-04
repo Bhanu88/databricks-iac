@@ -84,6 +84,18 @@ variable "storage_public_network_access_enabled" {
   default     = false
 }
 
+variable "azure_tenant_id" {
+  description = <<EOT
+Azure AD tenant ID.  Required so the Databricks account-level provider can enter
+the Azure auth code-path when using OIDC.  The accounts host
+(accounts.azuredatabricks.net) is cloud-agnostic, so the provider cannot infer
+Azure from the URL — azure_tenant_id must be supplied explicitly.
+In CI this is fed via TF_VAR_azure_tenant_id from AZURE_TENANT_ID secret.
+EOT
+  type      = string
+  sensitive = true
+}
+
 variable "databricks_metastore_id" {
   description = <<EOT
 Optional override: ID of an existing Unity Catalog metastore to adopt.

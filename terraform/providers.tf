@@ -44,9 +44,16 @@ provider "databricks" {
   # azure_tenant_id     = var.azure_tenant_id
 }
 
-# Databricks account-level provider for Unity Catalog metastore
+# Databricks account-level provider for Unity Catalog metastore.
+# The accounts host (accounts.azuredatabricks.net) is cloud-agnostic — the same
+# URL serves AWS, Azure, and GCP accounts, so the provider cannot infer the cloud
+# from the host alone.  Without azure_tenant_id the provider never enters the
+# Azure auth code-path and raises "Failed to retrieve tenant ID for given token"
+# when OIDC is in use.  ARM_TENANT_ID (consumed by azurerm) is NOT forwarded
+# automatically; we must set azure_tenant_id explicitly here.
 provider "databricks" {
-  alias      = "account"
-  host       = "https://accounts.azuredatabricks.net"
-  account_id = var.databricks_account_id
+  alias           = "account"
+  host            = "https://accounts.azuredatabricks.net"
+  account_id      = var.databricks_account_id
+  azure_tenant_id = var.azure_tenant_id
 }
