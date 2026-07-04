@@ -14,7 +14,19 @@
 # ============================================================
 
 # ----- Unity Catalog Metastore ----------------------------------------------
+# Databricks allows exactly one Unity Catalog metastore per Azure region per
+# account.  When var.existing_metastore_id is supplied (discovered by the CI
+# workflow before terraform runs), we skip creation entirely and adopt the
+# existing metastore.  When it is empty we create a new one — only valid for
+# accounts / regions that have no metastore yet.
+locals {
+  create_metastore = var.existing_metastore_id == ""
+  metastore_id     = local.create_metastore ? databricks_metastore.this[0].id : var.existing_metastore_id
+}
+
 resource "databricks_metastore" "this" {
+  count = local.create_metastore ? 1 : 0
+
   name          = "${var.prefix}-metastore"
   storage_root  = "abfss://${var.uc_container}@${var.storage_account_name}.dfs.core.windows.net/"
   region        = var.location
@@ -22,9 +34,19 @@ resource "databricks_metastore" "this" {
 }
 
 resource "databricks_metastore_assignment" "this" {
-  metastore_id         = databricks_metastore.this.id
-  workspace_id         = var.workspace_id
-  default_catalog_name = "hive_metastore" # keep legacy metastore available
+  metastore_id = local.metastore_id
+  workspace_id = var.workspace_id
+  # default_catalog_name is deprecated; set the default namespace via the
+  # databricks_default_namespace_setting resource below instead.
+}
+
+# Replaces the deprecated default_catalog_name argument on the assignment.
+resource "databricks_default_namespace_setting" "hive" {
+  namespace {
+    value = "hive_metastore"
+  }
+
+  depends_on = [databricks_metastore_assignment.this]
 }
 
 # ----- Storage Credential (Managed Identity) --------------------------------
@@ -35,7 +57,8 @@ resource "databricks_storage_credential" "datalake" {
     access_connector_id = var.access_connector_id
   }
 
-  comment = "Managed identity credential for ADLS Gen2 access via Unity Catalog"
+  comment    = "Managed identity credential for ADLS Gen2 access via Unity Catalog"
+  metastore_id = local.metastore_id
 
   depends_on = [databricks_metastore_assignment.this]
 }

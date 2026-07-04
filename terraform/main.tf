@@ -64,12 +64,13 @@ module "storage" {
 module "unity_catalog" {
   source = "./modules/unity_catalog"
 
-  prefix               = local.prefix
-  environment          = var.environment
-  location             = var.location
-  workspace_id         = module.workspace.databricks_workspace_id
-  storage_account_name = module.storage.storage_account_name
-  access_connector_id  = azurerm_databricks_access_connector.uc.id
+  prefix                = local.prefix
+  environment           = var.environment
+  location              = var.location
+  workspace_id          = module.workspace.databricks_workspace_id
+  storage_account_name  = module.storage.storage_account_name
+  access_connector_id   = azurerm_databricks_access_connector.uc.id
+  existing_metastore_id = var.databricks_metastore_id
 
   depends_on = [
     module.workspace,

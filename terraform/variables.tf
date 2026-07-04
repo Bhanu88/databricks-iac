@@ -83,3 +83,14 @@ variable "storage_public_network_access_enabled" {
   type        = bool
   default     = false
 }
+
+variable "databricks_metastore_id" {
+  description = <<EOT
+ID of an existing Unity Catalog metastore to adopt. Databricks allows exactly
+one metastore per Azure region per account — if one already exists, pass its ID
+here and Terraform will skip creation. Populated in CI by the 'Discover existing
+metastore' workflow step; leave empty only for a brand-new account/region.
+EOT
+  type    = string
+  default = ""
+}
