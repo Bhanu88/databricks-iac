@@ -86,14 +86,18 @@ variable "storage_public_network_access_enabled" {
 
 variable "azure_tenant_id" {
   description = <<EOT
-Azure AD tenant ID.  Required so the Databricks account-level provider can enter
-the Azure auth code-path when using OIDC.  The accounts host
+Azure AD tenant ID for the Databricks account-level provider.  The accounts host
 (accounts.azuredatabricks.net) is cloud-agnostic, so the provider cannot infer
-Azure from the URL — azure_tenant_id must be supplied explicitly.
-In CI this is fed via TF_VAR_azure_tenant_id from AZURE_TENANT_ID secret.
+Azure from the URL — azure_tenant_id must be supplied explicitly to force the
+Azure auth code-path.
+Set via TF_VAR_azure_tenant_id in CI (apply/plan).  Defaults to null for
+destroy or other operations that don't set the var; the provider then falls back
+to reading ARM_TENANT_ID from the environment, which is always set at the
+workflow level.
 EOT
   type      = string
   sensitive = true
+  default   = null
 }
 
 variable "databricks_metastore_id" {
