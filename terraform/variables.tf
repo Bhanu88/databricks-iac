@@ -84,29 +84,15 @@ variable "storage_public_network_access_enabled" {
   default     = false
 }
 
-variable "azure_tenant_id" {
-  description = <<EOT
-Azure AD tenant ID for the Databricks account-level provider.  The accounts host
-(accounts.azuredatabricks.net) is cloud-agnostic, so the provider cannot infer
-Azure from the URL — azure_tenant_id must be supplied explicitly to force the
-Azure auth code-path.
-Set via TF_VAR_azure_tenant_id in CI (apply/plan).  Defaults to null for
-destroy or other operations that don't set the var; the provider then falls back
-to reading ARM_TENANT_ID from the environment, which is always set at the
-workflow level.
-EOT
-  type      = string
-  sensitive = true
-  default   = null
-}
-
 variable "databricks_metastore_id" {
   description = <<EOT
-Optional override: ID of an existing Unity Catalog metastore to adopt.
-Normally left empty — Terraform auto-discovers the existing metastore via the
-databricks_metastores data source using the account-level provider.  Set this
-explicitly only when the account has multiple metastores and you need to target
-a specific one (e.g. via TF_VAR_databricks_metastore_id in CI).
+ID of an existing Unity Catalog metastore to adopt instead of creating a new one.
+Databricks enforces one metastore per Azure region per account, so this must be
+set if the account already has a metastore in the target region.
+In CI this is discovered automatically by a pre-Terraform shell step that calls
+the Databricks accounts REST API via the Azure CLI session and writes the ID to
+TF_VAR_databricks_metastore_id.  Leave empty only in a brand-new account that
+has no existing metastore.
 EOT
   type    = string
   default = ""

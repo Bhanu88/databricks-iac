@@ -2,16 +2,6 @@
 # Root module – orchestrates all child modules
 # ============================================================
 
-# Discover every Unity Catalog metastore registered with this Databricks account.
-# Databricks enforces exactly one metastore per Azure region per account; if the
-# account already has one we must adopt it rather than attempt creation.
-# Using the Databricks Terraform provider for discovery is more reliable than a
-# shell script because it reuses the same account-level auth that the rest of the
-# apply is already using.
-data "databricks_metastores" "all" {
-  provider = databricks.account
-}
-
 locals {
   prefix = "${var.project}-${var.environment}"
   common_tags = {
@@ -20,17 +10,6 @@ locals {
     managed_by  = "terraform"
     owner       = "platform-team"
   }
-
-  # Prefer an explicitly-supplied override (e.g. var.databricks_metastore_id set
-  # via TF_VAR_* or tfvars) — useful if the account has multiple metastores and
-  # you need to pick a specific one.  Otherwise fall back to the first metastore
-  # returned by the data source.  try() handles the case where the account has no
-  # metastore yet (empty ids map → values()[0] would error without it).
-  resolved_metastore_id = (
-    var.databricks_metastore_id != ""
-    ? var.databricks_metastore_id
-    : try(values(data.databricks_metastores.all.ids)[0], "")
-  )
 }
 
 # ----- Azure Databricks Access Connector ------------------------------------
@@ -91,7 +70,7 @@ module "unity_catalog" {
   workspace_id          = module.workspace.databricks_workspace_id
   storage_account_name  = module.storage.storage_account_name
   access_connector_id   = azurerm_databricks_access_connector.uc.id
-  existing_metastore_id = local.resolved_metastore_id
+  existing_metastore_id = var.databricks_metastore_id
 
   depends_on = [
     module.workspace,
