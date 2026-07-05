@@ -9,14 +9,6 @@ output "group_ids" {
   }
 }
 
-output "analyst_warehouse_id" {
-  value = databricks_sql_endpoint.analysts.id
-}
-
-output "analyst_warehouse_jdbc_url" {
-  value = databricks_sql_endpoint.analysts.jdbc_url
-}
-
 output "secret_scope_names" {
   value = { for k, v in databricks_secret_scope.team_scopes : k => v.name }
 }

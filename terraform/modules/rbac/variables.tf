@@ -4,7 +4,7 @@ variable "prefix" {
 }
 
 variable "workspace_numeric_id" {
-  description = "Numeric Databricks workspace ID (used for mws_permission_assignment)"
+  description = "Numeric Databricks workspace ID (reserved for future account-level operations)"
   type        = string
 }
 

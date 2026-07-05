@@ -30,11 +30,6 @@ output "shared_catalog_name" {
   value = module.unity_catalog.shared_catalog_name
 }
 
-output "analyst_warehouse_jdbc_url" {
-  description = "JDBC connection string for the analysts SQL warehouse"
-  value       = module.rbac.analyst_warehouse_jdbc_url
-}
-
 output "group_ids" {
   description = "Databricks group IDs by team name"
   value       = module.rbac.group_ids
