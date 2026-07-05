@@ -80,6 +80,8 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_databricks_metastore_id: ${{ secrets.DATABRICKS_METASTORE_ID }}
+          TF_VAR_databricks_token: ${{ secrets.DATABRICKS_TOKEN }}
 
   # ── Destroy Prod ───────────────────────────────────────────────────────────
   destroy-prod:
@@ -122,3 +124,5 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_databricks_metastore_id: ${{ secrets.DATABRICKS_METASTORE_ID }}
+          TF_VAR_databricks_token: ${{ secrets.DATABRICKS_TOKEN }}
