@@ -42,6 +42,11 @@ provider "azurerm" {
 # preventing UI-based role assignment.  The PAT owner (the account admin who
 # created the subscription) has full metastore admin rights by default.
 provider "databricks" {
-  host  = module.workspace.workspace_url
-  token = var.databricks_token
+  host      = module.workspace.workspace_url
+  token     = var.databricks_token
+  # Force PAT auth so the provider ignores the Azure OIDC env vars
+  # (ARM_CLIENT_ID, ARM_TENANT_ID, ACTIONS_ID_TOKEN_REQUEST_*) that GitHub
+  # Actions injects when id-token: write is set.  Without this, the provider
+  # sees both PAT and Azure credentials and refuses to start.
+  auth_type = "pat"
 }
