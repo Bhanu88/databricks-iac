@@ -20,8 +20,11 @@
 # existing metastore.  When it is empty we create a new one — only valid for
 # accounts / regions that have no metastore yet.
 locals {
-  create_metastore = var.existing_metastore_id == ""
-  metastore_id     = local.create_metastore ? databricks_metastore.this[0].id : var.existing_metastore_id
+  # trimspace guards against trailing newlines that can sneak in via GitHub
+  # secrets or CI env-var interpolation (e.g. "uuid\n" -> 37 chars -> API error).
+  _existing_id     = trimspace(var.existing_metastore_id)
+  create_metastore = local._existing_id == ""
+  metastore_id     = local.create_metastore ? databricks_metastore.this[0].id : local._existing_id
 }
 
 resource "databricks_metastore" "this" {
