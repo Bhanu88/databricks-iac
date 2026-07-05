@@ -87,7 +87,8 @@ jobs:
           echo "Querying Databricks accounts API for existing Unity Catalog metastores..."
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Bearer $TOKEN" \
-            "https://accounts.azuredatabricks.net/api/2.0/accounts/${DATABRICKS_ACCOUNT_ID}/unity-catalog/metastores")
+            -H "X-Databricks-Azure-Tenant-Id: $ARM_TENANT_ID" \
+            "https://accounts.azuredatabricks.net/api/2.0/accounts/${DATABRICKS_ACCOUNT_ID}/metastores")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)
@@ -172,7 +173,8 @@ jobs:
           echo "Querying Databricks accounts API for existing Unity Catalog metastores..."
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Bearer $TOKEN" \
-            "https://accounts.azuredatabricks.net/api/2.0/accounts/${DATABRICKS_ACCOUNT_ID}/unity-catalog/metastores")
+            -H "X-Databricks-Azure-Tenant-Id: $ARM_TENANT_ID" \
+            "https://accounts.azuredatabricks.net/api/2.0/accounts/${DATABRICKS_ACCOUNT_ID}/metastores")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)

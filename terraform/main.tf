@@ -2,6 +2,16 @@
 # Root module – orchestrates all child modules
 # ============================================================
 
+# ----- Safety net: discover existing Unity Catalog metastore -----------------
+# The deploy workflow pre-flight step sets TF_VAR_databricks_metastore_id when
+# it can authenticate to the Databricks accounts API.  If that step fails
+# (e.g. transient auth issue), fall back to querying the accounts API via the
+# Terraform MWS provider alias which uses the same Azure SDK credential chain
+# and handles tenant-ID resolution transparently.
+data "databricks_metastores" "all" {
+  provider = databricks.mws
+}
+
 locals {
   prefix = "${var.project}-${var.environment}"
   common_tags = {
@@ -10,6 +20,13 @@ locals {
     managed_by  = "terraform"
     owner       = "platform-team"
   }
+
+  # Use the metastore ID surfaced by the pre-flight step; fall back to the
+  # first metastore discovered via the MWS provider if the variable is empty.
+  effective_metastore_id = (
+    var.databricks_metastore_id != "" ? var.databricks_metastore_id :
+    try(values(data.databricks_metastores.all.ids)[0], "")
+  )
 }
 
 # ----- Azure Databricks Access Connector ------------------------------------
@@ -70,7 +87,7 @@ module "unity_catalog" {
   workspace_id          = module.workspace.databricks_workspace_id
   storage_account_name  = module.storage.storage_account_name
   access_connector_id   = azurerm_databricks_access_connector.uc.id
-  existing_metastore_id = var.databricks_metastore_id
+  existing_metastore_id = local.effective_metastore_id
 
   depends_on = [
     module.workspace,

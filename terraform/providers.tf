@@ -43,3 +43,13 @@ provider "databricks" {
   # azure_client_secret = var.azure_client_secret
   # azure_tenant_id     = var.azure_tenant_id
 }
+
+# Databricks provider – account-level operations (Unity Catalog metastore discovery)
+# Uses the Databricks Accounts API with the same Azure AAD credentials as above.
+# This lets Terraform auto-discover an existing metastore in the target region even
+# when the pre-flight shell discovery step cannot authenticate to the accounts API.
+provider "databricks" {
+  alias      = "mws"
+  host       = "https://accounts.azuredatabricks.net"
+  account_id = var.databricks_account_id
+}
