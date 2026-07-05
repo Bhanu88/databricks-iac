@@ -124,6 +124,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
   # ── Deploy Prod (requires manual approval via GitHub Environment) ─────────
   deploy-prod:
@@ -210,6 +211,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Terraform Apply
         working-directory: ${{ env.TF_DIR }}
@@ -218,3 +220,4 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PROD }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}

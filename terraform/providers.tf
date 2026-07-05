@@ -49,7 +49,8 @@ provider "databricks" {
 # This lets Terraform auto-discover an existing metastore in the target region even
 # when the pre-flight shell discovery step cannot authenticate to the accounts API.
 provider "databricks" {
-  alias      = "mws"
-  host       = "https://accounts.azuredatabricks.net"
-  account_id = var.databricks_account_id
+  alias          = "mws"
+  host           = "https://accounts.azuredatabricks.net"
+  account_id     = var.databricks_account_id
+  azure_tenant_id = var.azure_tenant_id
 }
