@@ -25,3 +25,8 @@ variable "analyst_warehouse_max_clusters" {
   type        = number
   default     = 3
 }
+
+variable "environment" {
+  description = "Deployment environment (dev, prod) – used to construct Unity Catalog object names for grants"
+  type        = string
+}

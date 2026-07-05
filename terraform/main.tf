@@ -89,6 +89,7 @@ module "rbac" {
   source = "./modules/rbac"
 
   prefix               = local.prefix
+  environment          = var.environment
   admin_user_emails    = var.admin_user_emails
   workspace_numeric_id = module.workspace.databricks_workspace_id
 

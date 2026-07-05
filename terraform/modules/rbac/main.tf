@@ -227,3 +227,197 @@ resource "databricks_secret_acl" "sp_platform_scope" {
   principal  = "service-principals"
   permission = "READ"
 }
+
+# ----- Unity Catalog Grants -------------------------------------------------
+# These grants reference group display_names so Terraform creates an implicit
+# dependency on the group resources above.  They are placed here (not in the
+# unity_catalog module) because the Databricks API rejects grants whose
+# principal does not yet exist.  The root module ensures rbac runs after
+# unity_catalog via depends_on, so the UC objects are ready by the time these
+# run.
+
+resource "databricks_grants" "storage_credential" {
+  storage_credential = "${var.prefix}-storage-credential"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+}
+
+resource "databricks_grants" "bronze_location" {
+  external_location = "${var.prefix}-bronze-location"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["READ_FILES", "WRITE_FILES", "CREATE_EXTERNAL_TABLE"]
+  }
+}
+
+resource "databricks_grants" "silver_location" {
+  external_location = "${var.prefix}-silver-location"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["READ_FILES", "WRITE_FILES", "CREATE_EXTERNAL_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["READ_FILES"]
+  }
+}
+
+resource "databricks_grants" "gold_location" {
+  external_location = "${var.prefix}-gold-location"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["READ_FILES", "WRITE_FILES", "CREATE_EXTERNAL_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["READ_FILES"]
+  }
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["READ_FILES"]
+  }
+}
+
+resource "databricks_grants" "models_location" {
+  external_location = "${var.prefix}-models-location"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["READ_FILES", "WRITE_FILES", "CREATE_EXTERNAL_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["READ_FILES", "WRITE_FILES", "CREATE_EXTERNAL_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["READ_FILES"]
+  }
+}
+
+resource "databricks_grants" "shared_location" {
+  external_location = "${var.prefix}-shared-location"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["READ_FILES", "WRITE_FILES", "CREATE_EXTERNAL_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["READ_FILES", "WRITE_FILES"]
+  }
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["READ_FILES"]
+  }
+}
+
+resource "databricks_grants" "energy_catalog" {
+  catalog = "energy_${var.environment}"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA", "CREATE_TABLE", "CREATE_VOLUME"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["USE_CATALOG"]
+  }
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["USE_CATALOG"]
+  }
+}
+
+resource "databricks_grants" "models_catalog" {
+  catalog = "models_${var.environment}"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA", "CREATE_TABLE", "CREATE_MODEL"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA", "CREATE_TABLE", "CREATE_MODEL"]
+  }
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["USE_CATALOG"]
+  }
+}
+
+resource "databricks_grants" "shared_catalog" {
+  catalog = "shared_${var.environment}"
+
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["USE_CATALOG", "CREATE_TABLE", "CREATE_SCHEMA"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["USE_CATALOG", "CREATE_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["USE_CATALOG"]
+  }
+}
+
+resource "databricks_grants" "curated_schema" {
+  schema = "energy_${var.environment}.curated"
+
+  grant {
+    principal  = databricks_group.analysts.display_name
+    privileges = ["USE_SCHEMA", "SELECT"]
+  }
+  grant {
+    principal  = databricks_group.data_scientists.display_name
+    privileges = ["USE_SCHEMA", "SELECT"]
+  }
+  grant {
+    principal  = databricks_group.data_engineers.display_name
+    privileges = ["USE_SCHEMA", "SELECT", "MODIFY", "CREATE_TABLE"]
+  }
+  grant {
+    principal  = databricks_group.platform_admins.display_name
+    privileges = ["ALL_PRIVILEGES"]
+  }
+}
