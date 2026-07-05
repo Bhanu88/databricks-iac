@@ -89,11 +89,22 @@ variable "databricks_metastore_id" {
 ID of an existing Unity Catalog metastore to adopt instead of creating a new one.
 Databricks enforces one metastore per Azure region per account, so this must be
 set if the account already has a metastore in the target region.
-In CI this is discovered automatically by a pre-Terraform shell step that calls
-the Databricks accounts REST API via the Azure CLI session and writes the ID to
-TF_VAR_databricks_metastore_id.  Leave empty only in a brand-new account that
-has no existing metastore.
+Supplied via TF_VAR_databricks_metastore_id from the DATABRICKS_METASTORE_ID
+GitHub secret.  Leave empty only in a brand-new account with no existing metastore.
 EOT
   type    = string
   default = ""
+}
+
+variable "databricks_token" {
+  description = <<EOT
+Personal Access Token of a Databricks account-admin user.  Used by the Databricks
+Terraform provider so it can perform account-level operations (metastore assignment,
+Unity Catalog grants) that require account-admin or metastore-admin privileges.
+A service principal with only workspace-admin rights is insufficient for these
+operations.  Supplied via TF_VAR_databricks_token from the DATABRICKS_TOKEN secret.
+EOT
+  type      = string
+  sensitive = true
+  default   = ""
 }

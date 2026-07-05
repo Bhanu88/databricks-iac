@@ -33,13 +33,15 @@ provider "azurerm" {
   }
 }
 
-# Databricks provider – workspace-level operations
-# Authenticates using the workspace URL + AAD token (set ARM_CLIENT_ID etc.)
+# Databricks provider – workspace-level and account-level operations
+# Authenticates using the workspace URL + a PAT from an account-admin user
+# (var.databricks_token → TF_VAR_databricks_token → DATABRICKS_TOKEN secret).
+# A PAT is required because the service principal running the Azure/ARM steps
+# does not have account-admin or metastore-admin rights in Databricks, and the
+# Databricks account console rejects personal Microsoft accounts (AADSTS500200),
+# preventing UI-based role assignment.  The PAT owner (the account admin who
+# created the subscription) has full metastore admin rights by default.
 provider "databricks" {
-  host = module.workspace.workspace_url
-
-  # When running in CI with a service principal:
-  # azure_client_id     = var.azure_client_id
-  # azure_client_secret = var.azure_client_secret
-  # azure_tenant_id     = var.azure_tenant_id
+  host  = module.workspace.workspace_url
+  token = var.databricks_token
 }
