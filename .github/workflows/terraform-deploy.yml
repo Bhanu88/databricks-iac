@@ -76,6 +76,8 @@ jobs:
       # The discovered metastore ID is exported as TF_VAR_databricks_metastore_id so
       # the unity_catalog module skips creation and adopts the existing metastore.
       - name: Discover existing Unity Catalog metastore
+        env:
+          DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
         run: |
           TOKEN=$(az account get-access-token \
             --resource "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" \
@@ -84,7 +86,7 @@ jobs:
           echo "Querying Databricks accounts API for existing Unity Catalog metastores..."
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Bearer $TOKEN" \
-            "https://accounts.azuredatabricks.net/api/2.0/unity-catalog/metastores")
+            "https://accounts.azuredatabricks.net/api/2.0/accounts/${DATABRICKS_ACCOUNT_ID}/unity-catalog/metastores")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)
@@ -158,6 +160,8 @@ jobs:
           sleep 30
 
       - name: Discover existing Unity Catalog metastore
+        env:
+          DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
         run: |
           TOKEN=$(az account get-access-token \
             --resource "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" \
@@ -166,7 +170,7 @@ jobs:
           echo "Querying Databricks accounts API for existing Unity Catalog metastores..."
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Bearer $TOKEN" \
-            "https://accounts.azuredatabricks.net/api/2.0/unity-catalog/metastores")
+            "https://accounts.azuredatabricks.net/api/2.0/accounts/${DATABRICKS_ACCOUNT_ID}/unity-catalog/metastores")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)
