@@ -90,6 +90,13 @@ variable "azure_tenant_id" {
   sensitive   = true
 }
 
+variable "azure_client_id" {
+  description = "Azure service principal client ID. Explicitly passed to the Databricks MWS provider so it uses the OIDC (v2) token exchange path, which produces tokens with the required 'tid' JWT claim."
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
 variable "databricks_metastore_id" {
   description = <<EOT
 ID of an existing Unity Catalog metastore to adopt instead of creating a new one.

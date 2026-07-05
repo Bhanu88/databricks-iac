@@ -81,7 +81,7 @@ jobs:
         run: |
           TOKEN=$(az account get-access-token \
             --tenant "$ARM_TENANT_ID" \
-            --resource "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" \
+            --scope "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default" \
             --query accessToken -o tsv)
 
           echo "Querying Databricks accounts API for existing Unity Catalog metastores..."
@@ -125,6 +125,7 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
           TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
 
   # ── Deploy Prod (requires manual approval via GitHub Environment) ─────────
   deploy-prod:
@@ -168,7 +169,7 @@ jobs:
         run: |
           TOKEN=$(az account get-access-token \
             --tenant "$ARM_TENANT_ID" \
-            --resource "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" \
+            --scope "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default" \
             --query accessToken -o tsv)
 
           echo "Querying Databricks accounts API for existing Unity Catalog metastores..."
@@ -212,6 +213,7 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
           TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PROD }}
 
       - name: Terraform Apply
         working-directory: ${{ env.TF_DIR }}
@@ -221,3 +223,4 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}
           TF_VAR_databricks_account_id: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
           TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID_PROD }}
