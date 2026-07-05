@@ -80,6 +80,7 @@ jobs:
           DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
         run: |
           TOKEN=$(az account get-access-token \
+            --tenant "$ARM_TENANT_ID" \
             --resource "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" \
             --query accessToken -o tsv)
 
@@ -164,6 +165,7 @@ jobs:
           DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
         run: |
           TOKEN=$(az account get-access-token \
+            --tenant "$ARM_TENANT_ID" \
             --resource "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" \
             --query accessToken -o tsv)
 
